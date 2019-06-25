@@ -114,13 +114,14 @@ static int push(Board_t * board, int tile) {
     
     if (offset == size) {
         /* reallocate board memory spaces with size + initialsize */
-        board->head = realloc(board->head, size + INITIAL_SIZE*sizeof(int));
-        if (!board->head) {
+        int* newhead = realloc(board->head, (size + INITIAL_SIZE)*sizeof(int));
+        if (!newhead) {
             fprintf(stderr, "ERROR: Unable to reallocate more memory for a the board!\n");
             board_destroy(board);
             return EXIT_FAILURE;
         }
-        size = board->size = size + INITIAL_SIZE*sizeof(int);
+        board->head = newhead;
+        board->size = size + INITIAL_SIZE;
     }
 
     int * curr = board->head + board->curr_offset;
