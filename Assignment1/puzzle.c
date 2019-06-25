@@ -30,9 +30,9 @@ int main()
         board_destroy(goal_board);
         return EXIT_FAILURE;
     }
-
-    print_board(start_board, "start");
-    print_board(goal_board, "goal");
+    
+    /* get the solvability and print out the results */
+    determine_solvability(start_board, goal_board);
 
     /* free all spaces allocated before exit*/
     board_destroy(start_board);

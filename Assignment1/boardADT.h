@@ -44,7 +44,7 @@ void print_board(Board_t * board, char * board_name);
 int check_correctness(Board_t * start_board, Board_t * goal_board);
 
 /* Determine if the goal_board is reachable from the start_board. */
-int determine_solvability(Board_t * start_board, Board_t * goal_board);
+void determine_solvability(Board_t * start_board, Board_t * goal_board);
 
 /* Destroy the given board and free the allocated spaces*/
 void board_destroy(Board_t* board);

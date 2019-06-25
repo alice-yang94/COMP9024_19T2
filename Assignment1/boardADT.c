@@ -1,8 +1,5 @@
 #include "boardADT.h"
 
-/* push new integer tile to the end dynamic array */
-static int push(Board_t * board, int tile);
-
 /**
  * A data type Board_t:
  * 1. head is address to start of memory location.
@@ -14,6 +11,15 @@ typedef struct Board {
     int curr_offset;
     int size;
 } Board_t;
+
+/* push new integer tile to the end dynamic array */
+static int push(Board_t * board, int tile);
+
+/* check if each board is valid */
+static int check_board(Board_t * board, char * name);
+
+/* calculate board disorder */
+static int calculate_disorder(Board_t * board);
 
 /* allocate memory with initial size */
 Board_t * initialise_board() {
@@ -107,14 +113,14 @@ static int push(Board_t * board, int tile) {
     int size = board->size;
     
     if (offset == size) {
-        /* reallocate board memory spaces with size doubled */
-        board->head = realloc(board->head, size * DOUBLE);
+        /* reallocate board memory spaces with size + initialsize */
+        board->head = realloc(board->head, size + INITIAL_SIZE*sizeof(int));
         if (!board->head) {
             fprintf(stderr, "ERROR: Unable to reallocate more memory for a the board!\n");
             board_destroy(board);
             return EXIT_FAILURE;
         }
-        size = board->size = size * DOUBLE;
+        size = board->size = size + INITIAL_SIZE*sizeof(int);
     }
 
     int * curr = board->head + board->curr_offset;
@@ -142,7 +148,8 @@ void print_board(Board_t * board, char * board_name) {
     }
 }
 
-int check_board(Board_t * board, char * name) {
+/* check if the board has tiles: blank(0) and 1..size-1 */
+static int check_board(Board_t * board, char * name) {
     int * head = board->head;
     int length = board->curr_offset;
     /* aim is the desired number, from 0 to length-1;
@@ -193,6 +200,53 @@ int check_correctness(Board_t * start_board, Board_t * goal_board) {
 
     return EXIT_SUCCESS;
 }
+
+/* calculate the board disorder by summing the disorders of each tile, 
+*   return 0 for even parity, 1 for odd parity.
+*/
+static int calculate_disorder(Board_t * board) {
+    int * head = board->head;
+    int length = board->curr_offset;
+    int sqrt_len = (int) sqrt(length);
+
+    int i, j;
+    int board_disorder = INITIAL;
+
+    for (i = INITIAL; i < length; i++) {
+        int curr_tile = *(head+i);
+        int curr_disorder = INITIAL;
+
+        if (curr_tile == BLANK) {
+            if (length%DOUBLE == INITIAL) {
+                /* if board has even length, add row number of blank tile to disorder */
+                board_disorder += (int) (i/sqrt_len) + 1;
+            }
+        } else {
+            for (j = i; j < length; j++) {
+                int tile_behind = *(head+j);
+                if (tile_behind < curr_tile) {
+                    curr_disorder++;
+                }
+            }
+        }
+        board_disorder += curr_disorder;
+    }
+    
+    return board_disorder%DOUBLE == INITIAL;
+}
+
+/* determine if goal board is reachable from start board, true for reachable */
+void determine_solvability(Board_t * start_board, Board_t * goal_board) {
+    print_board(start_board, "start");
+    print_board(goal_board, "goal");
+    int solvable = calculate_disorder(start_board) == calculate_disorder(goal_board);
+    if (solvable) {
+        printf("solvable\n");
+    } else {
+        printf("unsolvable\n");
+    }
+}
+
 
 /* free all memory allocated for the given board */
 void board_destroy(Board_t* board) {
