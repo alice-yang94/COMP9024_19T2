@@ -25,7 +25,6 @@ int main()
 
     /* check the two input boards have the correct format */
     if (check_correctness(start_board, goal_board)) {
-        printf("checked");
         board_destroy(start_board);
         board_destroy(goal_board);
         return EXIT_FAILURE;
