@@ -44,7 +44,7 @@ Board_t * initialise_board() {
 int read_input(Board_t * board) {
     int curr_num = INITIAL;
     char c = getchar();
-    while (c != NEWLINE) {
+    while (c != NEWLINE && c != EOF) {
         /* diff in ascii code between digit char and CHAR_ZERO is the digit 
            diff between 'b' and CHAR_ZERO is 50 */
         int digit = c - CHAR_ZERO;
@@ -224,7 +224,7 @@ static int calculate_disorder(Board_t * board) {
         } else {
             for (j = i; j < length; j++) {
                 int tile_behind = *(head+j);
-                if (tile_behind < curr_tile) {
+                if (tile_behind < curr_tile && tile_behind != BLANK) {
                     curr_disorder++;
                 }
             }
