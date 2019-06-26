@@ -31,7 +31,15 @@ int main()
     }
     
     /* get the solvability and print out the results */
-    determine_solvability(start_board, goal_board);
+    print_board(start_board, "start");
+    print_board(goal_board, "goal");
+    
+    int solvable = determine_solvability(start_board, goal_board);
+    if (solvable) {
+        printf("solvable\n");
+    } else {
+        printf("unsolvable\n");
+    }
 
     /* free all spaces allocated before exit*/
     board_destroy(start_board);

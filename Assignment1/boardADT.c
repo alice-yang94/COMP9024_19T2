@@ -213,8 +213,14 @@ static int check_board_new(Board_t * board, char * name) {
 
 /* check if the input board is correct */
 int check_correctness(Board_t * start_board, Board_t * goal_board) {
-    /* check if the start board have a square size*/
+    /* the smallest board is 2*2 which has length 4 */
     int length = start_board->curr_offset;
+    if (length < 4) {
+        printf("Input Error: the board size can't be smaller than 2*2!\n");
+        return EXIT_FAILURE;
+    }
+    
+    /* check if the start board have a square size*/
     int sqrt_length = sqrt(length);
     if (sqrt_length*sqrt_length != length) {
         printf("Input Error: the start board is not a square!\n");
@@ -269,15 +275,8 @@ static int calculate_disorder(Board_t * board) {
 }
 
 /* determine if goal board is reachable from start board, true for reachable */
-void determine_solvability(Board_t * start_board, Board_t * goal_board) {
-    print_board(start_board, "start");
-    print_board(goal_board, "goal");
-    int solvable = calculate_disorder(start_board) == calculate_disorder(goal_board);
-    if (solvable) {
-        printf("solvable\n");
-    } else {
-        printf("unsolvable\n");
-    }
+int determine_solvability(Board_t * start_board, Board_t * goal_board) {
+    return calculate_disorder(start_board) == calculate_disorder(goal_board);
 }
 
 
