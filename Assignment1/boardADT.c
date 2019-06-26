@@ -86,7 +86,6 @@ int read_input(Board_t * board) {
             /* continue if the previous char is also whitespace... */
 
         } else {
-            printf("\n%c\n", c);
             /* not digit or b or whitespace: Error */
             printf("Input Error: Only b or integers are allowed for a tile!\n");
             board_destroy(board);
@@ -153,6 +152,39 @@ void print_board(Board_t * board, char * board_name) {
 static int check_board(Board_t * board, char * name) {
     int * head = board->head;
     int length = board->curr_offset;
+
+    /* aim is the desired number, from 0 to length-1;
+       j is the searching index for board*/
+    int aim, j;
+    for (aim = INITIAL; aim < length; aim++) {
+        bool found = false;
+        for (j = INITIAL; j < length; j++) {
+            int curr = *(head+j);
+            if (aim == curr) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (aim == INITIAL) {
+                printf("Input Error: blank tile is not found in the %s board!\n", name);
+            } else {
+                printf("Input Error: tile %d is not found in the %s board!\n", aim, name);
+            }
+            return EXIT_FAILURE;
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int check_board_new(Board_t * board, char * name) {
+    int * head = board->head;
+    int length = board->curr_offset;
+
+    int * truth_board = malloc(sizeof(int) * length);
+
     /* aim is the desired number, from 0 to length-1;
        j is the searching index for board*/
     int aim, j;
