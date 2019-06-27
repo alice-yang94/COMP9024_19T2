@@ -15,8 +15,11 @@ typedef struct Board {
 /* push new integer tile to the end dynamic array */
 static int push(Board_t * board, int tile);
 
-/* check if each board is valid */
+/* check if each board is valid with truth board */
 static int check_board(Board_t * board, char * name);
+
+/* check if the board is valid without extra memory spaces */
+static int check_board_naive(Board_t * board, char * name)
 
 /* calculate board disorder */
 static int calculate_disorder(Board_t * board);
@@ -148,8 +151,8 @@ void print_board(Board_t * board, char * board_name) {
     }
 }
 
-/* check if the board has tiles: blank(0) and 1..size-1 */
-static int check_board(Board_t * board, char * name) {
+/* check if the board has tiles: blank(0) and 1..size-1 with n^2 complexity*/
+static int check_board_naive(Board_t * board, char * name) {
     int * head = board->head;
     int length = board->curr_offset;
 
@@ -179,35 +182,45 @@ static int check_board(Board_t * board, char * name) {
     return EXIT_SUCCESS;
 }
 
-static int check_board_new(Board_t * board, char * name) {
+/* check if the board has tiles: blank(0) and 1..size-1 using a truth board*/
+static int check_board(Board_t * board, char * name) {
     int * head = board->head;
     int length = board->curr_offset;
 
-    int * truth_board = malloc(sizeof(int) * length);
+    /* initialise a truth board with all 0 */
+    int * truth_board = calloc(length, sizeof(int));
+    if (!truth_board) {
+        /* if unable to allocate memory for truth board, do it with naive checking*/
+        return check_board_naive(board, name);
+    }
 
-    /* aim is the desired number, from 0 to length-1;
-       j is the searching index for board*/
-    int aim, j;
-    for (aim = INITIAL; aim < length; aim++) {
-        bool found = false;
-        for (j = INITIAL; j < length; j++) {
-            int curr = *(head+j);
-            if (aim == curr) {
-                found = true;
-                break;
-            }
+    /* updating the truth board cell with true if a number is found */
+    int i;
+    for (i = 0; i < length; i++) {
+        int curr_num = *(head+i);
+        if (curr_num < 0 || curr_num >= length) {
+            printf("Input Error: tile %d in the %s board is out of range!\n", curr_num, name);
+            free(truth_board);
+            return EXIT_FAILURE;
         }
+        *(truth_board + curr_num) = true;
+    }
 
-        if (!found) {
-            if (aim == INITIAL) {
-                printf("Input Error: blank tile is not found in the %s board!\n", name);
-            } else {
-                printf("Input Error: tile %d is not found in the %s board!\n", aim, name);
-            }
+    /* if the truth board has any false values, the input is incorrect */
+    if (!*truth_board) {
+        printf("Input Error: blank tile is not found in the %s board!\n", name);
+        free(truth_board);
+        return EXIT_FAILURE;
+    }
+
+    for (i = 1; i < length; i++) {
+        if (!*(truth_board + i)) {
+            printf("Input Error: tile %d is not found in the %s board!\n", i, name);
+            free(truth_board);
             return EXIT_FAILURE;
         }
     }
-
+    free(truth_board);
     return EXIT_SUCCESS;
 }
 
