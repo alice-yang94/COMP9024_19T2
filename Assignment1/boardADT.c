@@ -47,6 +47,10 @@ Board_t * initialise_board() {
 int read_input(Board_t * board) {
     int curr_num = INITIAL;
     char c = getchar();
+
+    /* true if previous char is b, used to determine the case like digits followed by b */
+    bool prev_b = false;
+
     while (c != NEWLINE && c != EOF) {
         /* diff in ascii code between digit char and CHAR_ZERO is the digit 
            diff between 'b' and CHAR_ZERO is 50 */
@@ -56,6 +60,11 @@ int read_input(Board_t * board) {
             if (curr_num == INITIAL && digit == INITIAL) {
                 /* 0 is not allowed and integer can't start with 0: Error */
                 printf("Input Error: Any tile start with 0 is invalid!\n");
+                board_destroy(board);
+                return EXIT_FAILURE;
+            } else if (prev_b) {
+                /* digits are not allowed to followed by b */
+                printf("Input Error: A tile cannot mix 'b' and digits!\n");
                 board_destroy(board);
                 return EXIT_FAILURE;
             } else {
@@ -70,6 +79,8 @@ int read_input(Board_t * board) {
                     return EXIT_FAILURE;
                 }
                 
+                prev_b = true;
+
             } else {
                 /* b is followed by some digits: Error */
                 printf("Input Error: A tile cannot mix 'b' and digits!\n");
@@ -85,7 +96,8 @@ int read_input(Board_t * board) {
                     return EXIT_FAILURE;
                 }
                 curr_num = INITIAL;
-            }
+            } 
+            prev_b = false;
             /* continue if the previous char is also whitespace... */
 
         } else {
