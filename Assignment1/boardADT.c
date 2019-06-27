@@ -19,7 +19,7 @@ static int push(Board_t * board, int tile);
 static int check_board(Board_t * board, char * name);
 
 /* check if the board is valid without extra memory spaces */
-static int check_board_naive(Board_t * board, char * name)
+static int check_board_naive(Board_t * board, char * name);
 
 /* calculate board disorder */
 static int calculate_disorder(Board_t * board);
