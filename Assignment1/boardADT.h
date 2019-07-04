@@ -3,9 +3,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
-
 #define true 1
 #define false 0
 
