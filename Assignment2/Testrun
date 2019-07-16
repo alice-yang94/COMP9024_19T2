@@ -1,0 +1,18 @@
+#!/bin/sh
+ PROG=./differ
+
+ case $1 in
+ 1) T=Tests/true* ;;
+ 2) T=Tests/false* ;;
+ esac
+
+ if [ A$T != A ]
+ then
+    for i in $T
+    do
+    echo =================  $i  ==================
+    $PROG < $i
+    done
+ else
+    echo Usage $0 "[1|2]"
+ fi
