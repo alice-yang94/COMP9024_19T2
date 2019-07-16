@@ -1,6 +1,5 @@
 /**
- * COMP9024 Assignment 2: Ordered Word Ladders version 2 
- * (using string.h)
+ * COMP9024 Assignment 2: Ordered Word Ladders version 1
  * 
  * @author Wenke Yang
  * @email z5230655@student.unsw.edu.au
@@ -11,13 +10,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 
 #define FIRST_STR_SHORTER_CODE 2
 #define SECOND_STR_SHORTER_CODE 3
 
 #define INPUT_STR_SIZE 100
-
 /**
  * Input: two null-terminated strings
  * Returns: bool
@@ -30,22 +27,25 @@
 bool differByOne(char *, char *);
 
 /**
- * Input: two null-terminated strings with same length
- * Returns: bool
+ * Input: two null-terminated strings
+ * Returns: int - 0: false
+ *                1: true
+ *                2: first str is shorter [FIRST_STR_SHORTER_CODE]
+ *                3: second str is shorter [SECOND_STR_SHORTER_CODE]
  * 
- * Check if one str changes one letter can become another 
+ * Check if one string can transform to another by 
+ * changing one letter
 */
-bool changeOne(char *, char *);
+int changeOneLetter(char *, char *);
 
 /**
  * Input: two null-terminated strings, str1 and str2
- *        str1 is shorter than str2 by 1.
+ *        str1 is shorter than str2 by 1, and 1 letter difference.
  * Returns: bool 
  * 
  * Check if str1 can transform to str2 by adding one letter
 */
 bool addOrRemoveOne(char *, char *);
-
 
 int main(void) {
     char str1[INPUT_STR_SIZE];
@@ -68,75 +68,76 @@ int main(void) {
 
 bool differByOne(char * str1, char * str2) {
     bool isdifferbyOne = false;
-    int len1 = strlen(str1);
-    int len2 = strlen(str2);
-    int lenDiff = len1 - len2;
+    // changing one letter
+    int changeOne = changeOneLetter(str1, str2);
 
-    switch (lenDiff) {
-        case 0:
-            // same length
-            isdifferbyOne = changeOne(str1, str2);
+    switch (changeOne) {
+        case false:
+            isdifferbyOne = false;
             break;
-        case 1:
-            // diff in length == 1, str2 is shorter
-            isdifferbyOne = addOrRemoveOne(str2, str1);
-            break;
-        case -1:
-            // diff in length == 1, str1 is shorter
+        case FIRST_STR_SHORTER_CODE:
             isdifferbyOne = addOrRemoveOne(str1, str2);
             break;
+        case SECOND_STR_SHORTER_CODE:
+            isdifferbyOne = addOrRemoveOne(str2, str1);
+            break;
         default:
-            // diff in length > 1
+            isdifferbyOne = true;
             break;
     }
 
     return isdifferbyOne;
 }
 
-bool changeOne(char * str1, char * str2) {
+int changeOneLetter(char * str1, char * str2) {
     int i = 0;
-    char c1 = *str1;
-    char c2 = *str2;
     int diff = 0;
-
-    while (c1 != '\0' && diff <= 1) {
-        if (c1 != c2) {
+    while (*(str1+i) != '\0' && *(str2+i) != '\0') {
+        if (*(str1+i) - *(str2+i)) {
             diff++;
         }
-
         i++;
-        c1 = *(str1+i);
-        c2 = *(str2+i);
+    }
+    
+    char * strLong = str2;
+    int changeOne = FIRST_STR_SHORTER_CODE;
+    if (*(str1+i) != '\0') {
+        // str2 is shorter
+        strLong = str1;
+        changeOne = SECOND_STR_SHORTER_CODE;
     }
 
-    bool changeOneResult = false;
-    if (diff == 1) {
-        changeOneResult = true;
+    int lengthDiff = 0;
+    while (*(strLong+i) != '\0') {
+        lengthDiff += 1;
+        i++;
     }
-    return changeOneResult;
+
+    if (lengthDiff == 0) {
+        // same lengths and 1 diff in letter
+        // str1 can change one letter to transform to str2
+        if (diff == 1) {
+            changeOne = true;
+        } else {
+            changeOne = false;
+        }
+    } else if (lengthDiff > 1) {
+        changeOne = false;
+    }
+    return changeOne;
 }
 
 bool addOrRemoveOne(char * str1, char * str2) {
+    bool addOne = true;
     int i1 = 0;
     int i2 = 0;
-    char c1 = *str1;
-    char c2 = *str2;
-    int diff = 0;
 
-    while (c1 != '\0' && diff <= 1) {
-        if (c1 == c2) {
+    while (*(str1+i1) != '\0') {
+        if (*(str1+i1) - *(str2+i2) == 0) {
             i1++;
-        } else {
-            diff++;
-        }
+        } 
         i2++;
-        c1 = *(str1+i1);
-        c2 = *(str2+i2);
     }
 
-    bool addOne = false;
-    if (diff <= 1) {
-        addOne = true;
-    }
     return addOne;
 }
