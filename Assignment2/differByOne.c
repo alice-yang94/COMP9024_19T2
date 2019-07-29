@@ -8,63 +8,7 @@
  * @description 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-
-#define FIRST_STR_SHORTER_CODE 2
-#define SECOND_STR_SHORTER_CODE 3
-
-#define INPUT_STR_SIZE 100
-
-/**
- * Input: two null-terminated strings
- * Returns: bool
- * 
- * Check if the two strings satisfy one of the 2 conditions below:
- * 1. changing one letter, e.g. barn→born
- * 2. adding or removing one letter, e.g. band→brand and bran→ran
- * 
-*/
-bool differByOne(char *, char *);
-
-/**
- * Input: two null-terminated strings with same length
- * Returns: bool
- * 
- * Check if one str changes one letter can become another 
-*/
-bool changeOne(char *, char *);
-
-/**
- * Input: two null-terminated strings, str1 and str2
- *        str1 is shorter than str2 by 1.
- * Returns: bool 
- * 
- * Check if str1 can transform to str2 by adding one letter
-*/
-bool addOrRemoveOne(char *, char *);
-
-
-int main(void) {
-    char str1[INPUT_STR_SIZE];
-    char str2[INPUT_STR_SIZE];
-    printf("Enter the first string:\n");
-    scanf("%s", str1);
-    printf("%s\n", str1);
-
-    printf("Enter the second string:\n");
-    scanf("%s", str2);
-    printf("%s\n", str2);
-
-    if (differByOne(str1, str2)) {
-        printf("True. Two strings are different by one!\n");
-    } else {
-        printf("False. Two strings are not differ by one!\n");
-    }
-    return EXIT_SUCCESS;
-}
+#include "differByOne.h"
 
 bool differByOne(char * str1, char * str2) {
     bool isdifferbyOne = false;

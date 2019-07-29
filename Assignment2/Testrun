@@ -2,8 +2,8 @@
  PROG=./differ
 
  case $1 in
- 1) T=Tests/true* ;;
- 2) T=Tests/false* ;;
+ 1) T=differByOneTests/true* ;;
+ 2) T=differByOneTests/false* ;;
  esac
 
  if [ A$T != A ]
