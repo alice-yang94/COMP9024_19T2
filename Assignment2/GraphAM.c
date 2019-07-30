@@ -1,5 +1,4 @@
 // GraphAM.c: an adjacency matrix implementation
-// Provided by Prof. Albert Nymeyer
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +43,7 @@ Graph newGraph(int numVertices) {
     return g;
 }
 
-Graph freeGraph(Graph g) {
+Graph freeGraph(Graph g) { 
    if (g != NULL) {
        int i;
        for (i = 0; i < g->nV; i++) {
@@ -88,8 +87,7 @@ static int validV(Graph g, Vertex v) { // checks if v is in graph
 Edge newEdge(Vertex v, Vertex w) { // create an edge from v to w 
     Edge e = {v, w};
     return e; 
-}
-
+} 
 void showEdge(Edge e) { // print an edge
     printf("<%d %d>", e.v, e.w);
     return; 
@@ -103,10 +101,9 @@ int isEdge(Edge e, Graph g) { // return 1 if edge found, otherwise 0
    return found;
 }
 
-
 void insertEdge(Edge e, Graph g) { // insert an edge into a graph 
    if (g == NULL) {
-      fprintf(stderr, "insertE: graph not initialised\n");
+      fprintf(stderr, "insertEdge: graph not initialised\n");
    }
    else {
        if (!validV(g, e.v) || !validV(g, e.w)) {
@@ -129,7 +126,7 @@ void removeEdge(Edge e, Graph g) { // remove an edge from a graph
     }
     else {
         if (!validV(g, e.v) || !validV(g, e.w)) {
-            fprintf(stderr, "removeE: invalid vertices\n");
+            fprintf(stderr, "removeEdge: invalid vertices\n");
         }
         else {
             if (isEdge(e, g) == 1) {   // is edge there?

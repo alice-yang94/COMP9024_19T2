@@ -1,12 +1,14 @@
-CC = gcc
-CFLAGS = -O -Wall -Werror
+CC=gcc
+CFLAGS=-I.
+DEPS=Graph.h Quack.h
+OBJ=GraphAM.o Quack.o owl.o
 
-# syntax: 
-# $ gcc -Olevel [options] [source files] [object files] [-o output file]
-# https://www.rapidtables.com/code/linux/gcc/gcc-o.html#output%20file
-differ: differByOne.c differByOne.h
-	$(CC) $(CFLAGS) differByOne.c -o differ
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+owl: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
 clean:
-	rm -f differ *.o
+	rm -f *.o owl core

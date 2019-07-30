@@ -1,5 +1,5 @@
 #!/bin/sh
- PROG=./differ
+ PROG=./owl
 
  case $1 in
  1) T=differByOneTests/true* ;;
