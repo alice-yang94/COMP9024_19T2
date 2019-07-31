@@ -87,34 +87,36 @@ void printDictionary(char **, int);
  *        an int with array length,
  *        a pointer to an int to store the longest ladder length,
  *        a queue to store all start nodes of longest paths
- * Returns: a graph, stores the longest paths' next node from each node 
+ * Returns: an array of stacks, each stores the longest paths' 
+ *          next node from the current node 
  * 
  * Get the longest ladders from given graph
 */
-Graph getLongestLadders(Graph, int, int *, Quack);
+Quack* getLongestLadders(Graph, int, int *, Quack);
 
 /**
  * Input: a current node, 
  *        a differByOne graph, 
  *        total number of words,
  *        a int array to store the current max length from each node,
- *        a graph, stores the longest paths' next node from each node
+ *        an array of stacks, each to store the longest paths' 
+ *          next node from the current node
  * Returns: the longest path length from currNode
  * 
  * Get the longest ladders from given node
 */
-int dfsR(Vertex, Graph, int, int *, Graph);
+int dfsR(Vertex, Graph, int, int *, Quack *);
 
 /**
- * Input: a graph, stores the longest paths' next node from each node,
+ * Input: an array of stacks with the longest paths' next node 
+ *             from the current node,
  *        a queue with all start nodes of longest paths,
- *        an array of input words,
- *        total number of words
+ *        an array of input words
  * Returns: void
  * 
  * Print longest ladders
 */
-void printLongestLadders(Graph, Quack, char **, int);
+void printLongestLadders(Quack *, Quack, char **);
 
 /**
  * Input: a queue storing one of the longest path,
@@ -127,6 +129,13 @@ void printLongestLadders(Graph, Quack, char **, int);
 */
 void printPath(Quack, int, int *, char **);
 
+/**
+ * Input: an array of stacks, a int with number of words
+ * Returns: a NULL pointer
+ * 
+ * Free all spaces allocated for the array of stacks
+*/
+Quack* freeQuackArray(Quack*, int);
 
 
 int main(void) {
@@ -151,20 +160,20 @@ int main(void) {
             // calculate longest ladders with generated graph
             int longestLen = 0;
             Quack maxLenStartNodes = createQuack();
-            Graph pathGraph = getLongestLadders(g, numWords,
+            Quack* pathStacks = getLongestLadders(g, numWords,
                 &longestLen, maxLenStartNodes);
 
-            if (pathGraph == NULL) {
+            if (pathStacks == NULL) {
                 exitStatus = EXIT_FAILURE;
             } else {
                 // print the longest ladders...
                 printf("Longest ladder length: %d\n", longestLen);
-                printLongestLadders(pathGraph, maxLenStartNodes, 
-                    wordArray, numWords);
+                printLongestLadders(pathStacks, maxLenStartNodes, 
+                    wordArray);
 
                 // free the memory allocated
-                pathGraph = freeGraph(pathGraph);
-                pathGraph = NULL;
+                pathStacks = freeQuackArray(pathStacks, numWords);
+                pathStacks = NULL;
             }
             
             // free the memory allocated
@@ -268,7 +277,7 @@ char ** initialiseWordArray(void) {
         int i;
         int success = 1;
         for (i=0; i<MAX_NODE && success; i++) {
-            wordArray[i] = malloc((MAX_WORD_LEN + 1) * sizeof(char));
+            wordArray[i] = malloc((MAX_WORD_LEN+1) * sizeof(char));
             if (wordArray[i] == NULL) {
                 fprintf(stderr, "initialise WordArray: out of memory\n");
                 success = 0;
@@ -330,34 +339,36 @@ void printDictionary(char ** wordArray, int numWords) {
 }
 
 // Search for the longest ladders from the differByOne graph
-Graph getLongestLadders(Graph g, int numWords, int * longestLen, 
+Quack* getLongestLadders(Graph g, int numWords, int * longestLen, 
                          Quack maxLenStartNodes) 
 {
-    // each node will construct edges to the next nodes of the longest 
+    // an array of stacks, each stack stored next node of the longest 
     //    paths start from the node(index of word) 
-    Graph pathGraph = newGraph(numWords);
+    Quack * pathStacks = malloc(numWords * sizeof(Quack));
 
     // visitedArray[i] stores the max ladder length starting from node i
     int * visitedArray = malloc(numWords * sizeof(int));
     
-    if (visitedArray == NULL || pathGraph == NULL) {
+    if (visitedArray == NULL || pathStacks == NULL) {
         fprintf(stderr, "getLongestLadders: out of memory\n");
     } else {
         int i;
         for (i=0; i<numWords; i++) {
             // initialise unvisited node with max length -1
             visitedArray[i] = -1;
+            // initialise all path stacks as empty stacks
+            pathStacks[i] = createQuack();
         }
         // DFS on each unvisited node until all nodes visited
         qush(0, maxLenStartNodes);
-        *longestLen = dfsR(0, g, numWords, visitedArray, pathGraph);
+        *longestLen = dfsR(0, g, numWords, visitedArray, pathStacks);
         
         if (numWords > 1) {
             int startNode;
             for (startNode = 1; startNode < numWords; startNode++) {
                 if (visitedArray[startNode] == -1) {
                     int newLen = dfsR(startNode, g, numWords, visitedArray, 
-                        pathGraph);
+                        pathStacks);
 
                     if (newLen > *longestLen) {
                         *longestLen = newLen;
@@ -375,12 +386,12 @@ Graph getLongestLadders(Graph g, int numWords, int * longestLen,
         visitedArray = NULL;
     
     }
-    return pathGraph;
+    return pathStacks;
 }
 
 // Search and record the longest ladders from given node using recursion
 int dfsR(Vertex currNode, Graph g, int numWords, int * visitedArray, 
-        Graph pathGraph) 
+        Quack * pathStacks) 
 {
     int maxLen = 1;
     if (visitedArray[currNode] != -1) { // currNode is visited
@@ -398,25 +409,17 @@ int dfsR(Vertex currNode, Graph g, int numWords, int * visitedArray,
                 if (visitedArray[child] == -1) {
                     hasUnvisitedChild = true;
                     currMaxLen = 1 + dfsR(child, g, numWords, 
-                        visitedArray, pathGraph);
+                        visitedArray, pathStacks);
                 } 
 
                 // if new length bigger, empty the quack and  the 
                 //  current child; if equals, push the child to the quack
                 if (currMaxLen > maxLen) {
                     maxLen = currMaxLen;
-                    
-                    // remove all edges connect to currNode
-                    int prevChild;
-                    for (prevChild = currNode + 1; prevChild < numWords; 
-                            prevChild++) {
-                        removeEdge(newEdge(currNode,prevChild), pathGraph);
-                    }
-                    // add bigger length child to currNode
-                    insertEdge(newEdge(currNode, child), pathGraph);
-                    
+                    makeEmptyQuack(pathStacks[currNode]);
+                    push(child, pathStacks[currNode]);
                 } else if (currMaxLen == maxLen) {
-                    insertEdge(newEdge(currNode, child), pathGraph);
+                    push(child, pathStacks[currNode]);
                 }
 
             }
@@ -429,33 +432,14 @@ int dfsR(Vertex currNode, Graph g, int numWords, int * visitedArray,
 }
 
 // print longest ladders using path Stacks and start nodes
-void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
-    char ** wordArray, int numWords) 
+void printLongestLadders(Quack * pathStacks, Quack maxLenStartNodes,
+    char ** wordArray) 
 {
-    /* debug
-    printf("\npathGraph: ");
-    showGraph(pathGraph);
-    printf("\n");
-*/
     printf("Longest ladders:\n");
     int order = 1;
     while (!isEmptyQuack(maxLenStartNodes) && order < 100) {
         int startNode = pop(maxLenStartNodes);
-        
-        // startStack stores all children of startNode
-        Quack startStack = createQuack();
-        int startChild;
-        for (startChild = startNode + 1; startChild < numWords; 
-                startChild++) {
-            if (isEdge(newEdge(startNode, startChild), pathGraph)) {
-                push(startChild, startStack);
-            }
-        }
-
-        /*/debug
-        printf("startStack: ");
-        showQuack(startStack);*/
-        
+        Quack startStack = pathStacks[startNode];
         if (isEmptyQuack(startStack)) {
             printf("%2d: %s\n", order, wordArray[startNode]);
             order++;
@@ -469,26 +453,12 @@ void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
             push(startNode, currStack);
             push(-1, lastStack);
 
-            /* debug
-            printf("currStack: ");
-            showQuack(currStack);
-*/
             while (!isEmptyQuack(currStack) && order < 100) {
                 int currNode = pop(currStack);
                 pop(lastStack);
                 qush(currNode, fullPath);
                 // childStack contains all children of currNode
-                Quack childStack = createQuack();//pathGraph[currNode];
-                int child;
-                for (child = currNode + 1; child < numWords; child++) {
-                    if (isEdge(newEdge(currNode, child), pathGraph)) {
-                        push(child, childStack);
-                    }
-                }
-
-                /*debug
-                printf("childStack: ");
-                showQuack(childStack);*/
+                Quack childStack = pathStacks[currNode];
 
                 // if childStack is empty, path end reached, print path
                 if (isEmptyQuack(childStack)) {
@@ -574,4 +544,14 @@ void printPath(Quack fullPath, int nextLast, int *order, char **wordArray)
     }
     destroyQuack(stack);
     return;
+}
+
+// Free all spaces allocated for the array of quacks
+Quack* freeQuackArray(Quack* pathStacks, int numWords) {
+    int i;
+    for (i=0; i<numWords; i++) {
+        pathStacks[i] = destroyQuack(pathStacks[i]);
+    }
+    free(pathStacks);
+    return pathStacks;
 }
