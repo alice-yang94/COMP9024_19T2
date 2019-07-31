@@ -261,14 +261,14 @@ bool addOrRemoveOne(char * str1, char * str2) {
 // Allocate memory for the word array
 char ** initialiseWordArray(void) {
     char ** wordArray = NULL;
-    wordArray = malloc(MAX_NODE * sizeof(char *));
+    wordArray = malloc((MAX_NODE+1) * sizeof(char *));
     if (wordArray == NULL) {
         fprintf(stderr, "initialise WordArray: out of memory\n");
     } else {
         int i;
         int success = 1;
         for (i=0; i<MAX_NODE && success; i++) {
-            wordArray[i] = malloc(MAX_WORD_LEN * sizeof(char));
+            wordArray[i] = malloc((MAX_WORD_LEN + 1) * sizeof(char));
             if (wordArray[i] == NULL) {
                 fprintf(stderr, "initialise WordArray: out of memory\n");
                 success = 0;
@@ -432,11 +432,11 @@ int dfsR(Vertex currNode, Graph g, int numWords, int * visitedArray,
 void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
     char ** wordArray, int numWords) 
 {
-    //debug
+    /* debug
     printf("\npathGraph: ");
     showGraph(pathGraph);
     printf("\n");
-
+*/
     printf("Longest ladders:\n");
     int order = 1;
     while (!isEmptyQuack(maxLenStartNodes) && order < 100) {
@@ -452,9 +452,9 @@ void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
             }
         }
 
-        //debug
+        /*/debug
         printf("startStack: ");
-        showQuack(startStack);
+        showQuack(startStack);*/
         
         if (isEmptyQuack(startStack)) {
             printf("%2d: %s\n", order, wordArray[startNode]);
@@ -469,10 +469,10 @@ void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
             push(startNode, currStack);
             push(-1, lastStack);
 
-            //debug
+            /* debug
             printf("currStack: ");
             showQuack(currStack);
-
+*/
             while (!isEmptyQuack(currStack) && order < 100) {
                 int currNode = pop(currStack);
                 pop(lastStack);
@@ -486,9 +486,9 @@ void printLongestLadders(Graph pathGraph, Quack maxLenStartNodes,
                     }
                 }
 
-                //debug
+                /*debug
                 printf("childStack: ");
-                showQuack(childStack);
+                showQuack(childStack);*/
 
                 // if childStack is empty, path end reached, print path
                 if (isEmptyQuack(childStack)) {
