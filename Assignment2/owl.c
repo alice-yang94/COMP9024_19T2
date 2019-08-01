@@ -224,6 +224,7 @@ bool changeOne(char * str1, char * str2) {
     char c2 = *str2;
     int diff = 0;
 
+    // loop through two strings, check number of different letters
     while (c1 != '\0' && diff <= 1) {
         if (c1 != c2) {
             diff++;
@@ -233,7 +234,8 @@ bool changeOne(char * str1, char * str2) {
         c1 = *(str1+i);
         c2 = *(str2+i);
     }
-
+    
+    // if more than one different letter found, return false 
     bool changeOneResult = false;
     if (diff == 1) {
         changeOneResult = true;
@@ -249,6 +251,8 @@ bool addOrRemoveOne(char * str1, char * str2) {
     char c2 = *str2;
     int diff = 0;
 
+    // loop through two strings, if skip one letter in str2 can match 
+    //str1, diff will be one
     while (c1 != '\0' && diff <= 1) {
         if (c1 == c2) {
             i1++;
@@ -260,6 +264,7 @@ bool addOrRemoveOne(char * str1, char * str2) {
         c2 = *(str2+i2);
     }
 
+    // if str2 skip one letter is str1, return true, else, false
     bool addOne = false;
     if (diff <= 1) {
         addOne = true;
@@ -270,6 +275,8 @@ bool addOrRemoveOne(char * str1, char * str2) {
 // Allocate memory for the word array
 char ** initialiseWordArray(void) {
     char ** wordArray = NULL;
+    // allocate memory for string array that can store 
+    //MAX_NODE number of string, plus one for null-terminator
     wordArray = malloc((MAX_NODE+1) * sizeof(char *));
     if (wordArray == NULL) {
         fprintf(stderr, "initialise WordArray: out of memory\n");
@@ -277,6 +284,8 @@ char ** initialiseWordArray(void) {
         int i;
         int success = 1;
         for (i=0; i<MAX_NODE && success; i++) {
+            // allocate memory each string that can store MAX_WORD_LEN 
+            //characters, plus one for null-terminator
             wordArray[i] = malloc((MAX_WORD_LEN+1) * sizeof(char));
             if (wordArray[i] == NULL) {
                 fprintf(stderr, "initialise WordArray: out of memory\n");
